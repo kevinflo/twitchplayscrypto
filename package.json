@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "irc": "^0.5.2",
+    "nconf": "^0.8.4",
     "node.bittrex.api": "^0.5.1"
   }
 }

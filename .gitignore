@@ -58,4 +58,5 @@ typings/
 .env
 
 # secrets
-config/secrets*
+config/chatConfig.json
+config/secrets.json
