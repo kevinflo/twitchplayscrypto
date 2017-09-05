@@ -157,12 +157,50 @@ function updateTotalsContainer(){
 }
 
 function updateFeatureContainer(){
+    if (cryptoState && cryptoState.btcMarket && cryptoState.btcMarket.Last){
+        var price = cryptoState.btcMarket.Last;
 
+        var prevDay = cryptoState.btcMarket.PrevDay;
+
+        var up = false;
+
+        if (prevDay < price){
+            up = true;
+        }
+
+        var difference = 100 - (price / prevDay) * 100;
+
+        var normalizedDifference = difference.toString();
+
+        if (normalizedDifference.length > 5){
+            normalizedDifference = normalizedDifference.slice(0, 5);
+        }
+
+        var differenceCharacter = "-";
+
+        if (up){
+            differenceCharacter = "+";
+        }
+
+        var priceString = "$ " + price.toString();
+
+        priceString += " (" + differenceCharacter + " " + normalizedDifference + " %)" ;
+
+        $(".btc-price-now").html(priceString);
+
+        if (up){
+            $(".btc-price-now").addClass("up");
+            $(".btc-price-now").removeClass("down");
+        } else {
+            $(".btc-price-now").addClass("down");
+            $(".btc-price-now").removeClass("up");
+        }
+    }
 }
 
 function updateMetaContainer(){
     if (testMode){
-        $(".test-mode").show();
+        $(".test-mode").show()
     }
 }
 
