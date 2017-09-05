@@ -278,7 +278,7 @@ function transactWinner(winner){
 
                         if (calculatedBuy && calculatedBuy.quantity && calculatedBuy.rate){
                             console.log("EXECUTING BUY", {market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate})
-                            bittrex.buylimit({market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuyrate});
+                            bittrex.buylimit({market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate});
                         }
                     }
                 });
