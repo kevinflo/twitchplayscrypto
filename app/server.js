@@ -333,11 +333,14 @@ var router = express.Router();
 
 router.post('/start', function(req, res, next) {
     console.log("round started")
+
     resetRoundState();
+    res.send('round started');
 })
 router.post('/end', function(req, res, next) {
     console.log("round ended")
     handleRoundEnd();
+    res.send('round ended');
 })
 
 router.post('/start/test', function(req, res, next) {
