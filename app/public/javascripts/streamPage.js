@@ -20,7 +20,7 @@ window.roundState = roundState;
 var voteRoundTime = 600;
 var pauseRoundTime = 60;
 
-var testMode = true;
+var testMode = false;
 
 if (testMode){
     voteRoundTime = 15;
@@ -51,7 +51,8 @@ function startApp() {
 $(startApp.bind(this));
 
 function updateTimeState() {
-    if (!--timeState.seconds) {
+    timeState.seconds = timeState.seconds - 1;
+    if (timeState.seconds === 0) {
         if (timeState.pause) {
             handleRoundStart();
         } else {
