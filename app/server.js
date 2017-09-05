@@ -278,7 +278,9 @@ function transactWinner(winner){
 
                         if (calculatedBuy && calculatedBuy.quantity && calculatedBuy.rate){
                             console.log("EXECUTING BUY", {market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate})
-                            bittrex.buylimit({market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate});
+                            bittrex.buylimit({market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate}, function(data, err){
+                                console.log("buy worked")
+                            });
                         }
                     }
                 });
@@ -298,7 +300,9 @@ function transactWinner(winner){
 
                     if (calculatedSell.quantity && calculatedSell.rate){
                         console.log("EXECUTING SELL", {market: marketName, quantity: calculatedSell.quantity, rate: calculatedSell.rate})
-                        bittrex.selllimit({market: marketName, quantity: calculatedSell.quantity, rate: calculatedSell.rate});
+                        bittrex.selllimit({market: marketName, quantity: calculatedSell.quantity, rate: calculatedSell.rate}, function(data, err){
+                            console.log("sell worked")
+                        });
                     } 
                 }
             });
