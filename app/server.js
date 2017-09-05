@@ -255,6 +255,9 @@ function calculateSell(resp, symbol, marketName, data){
 
 function notBuyable(){
     console.log("not buyable")
+    roundState.winner = {
+        situation: "NOT_ENOUGH"
+    }
 }
 
 function notSellable(){
@@ -302,15 +305,16 @@ function transactWinner(winner){
     }
 }
 
-function handleRoundEnd() {
+function handleRoundEnd(test) {
     var winner = determineWinner();
 
     console.log("determined winner", winner);
-
     resetRoundState(winner);
 
-    if (winner && winner.action){
+    if (winner && winner.action && !test){
         transactWinner(winner);
+    } else {
+        console.log("NO WINNER OR ITS A TEST")
     }
 }
 
@@ -330,6 +334,16 @@ router.post('/end', function(req, res, next) {
     console.log("round ended")
     handleRoundEnd();
 })
+
+router.post('/start/test', function(req, res, next) {
+    console.log("round started TEST")
+    resetRoundState(true);
+})
+router.post('/end/test', function(req, res, next) {
+    console.log("round ended TEST")
+    handleRoundEnd(true);
+})
+
 router.get('/', function(req, res, next) {
     res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
     res.header('Expires', '-1');

@@ -84,7 +84,13 @@ function handleRoundStart() {
 
     $(".time-title").html("Round ends in:");
 
-    fetch("http://localhost:3000/round/start", {
+    var route = "http://localhost:3000/round/start";
+
+    if (testMode){
+        route = "http://localhost:3000/round/start/test";
+    }
+
+    fetch(route, {
         method: "POST"
     }).then(function(resp){
         console.log("round started");
@@ -98,7 +104,13 @@ function handlePauseStart() {
 
     $(".time-title").html("Round starts in:");
 
-    fetch("http://localhost:3000/round/end", {
+    var route = "http://localhost:3000/round/end";
+
+    if (testMode){
+        route = "http://localhost:3000/round/end/test";
+    }
+
+    fetch(route, {
         method: "POST"
     }).then(function(resp){
         console.log("round ended");
@@ -212,6 +224,8 @@ function renderLastWinner(){
         $(".last-winner-info").show();
         if (roundState.winner.situation === "TIE"){
             $(".last-winner-info").html("Last round was a tie. Waiting for a real winner!");
+        } else if (roundState.winner.situation === "NOT_ENOUGH"){
+             $(".last-winner-info").html("Insufficient BTC in account to place buy :(");
         } else if (roundState.winner.action && roundState.winner.symbol && roundState.winner.symbol.toUpperCase) {
             $(".last-winner-info").html("!" + roundState.winner.action + " " + roundState.winner.symbol.toUpperCase());                
         }
