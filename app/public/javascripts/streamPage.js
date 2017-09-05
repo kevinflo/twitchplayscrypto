@@ -20,7 +20,7 @@ window.roundState = roundState;
 var voteRoundTime = 600;
 var pauseRoundTime = 60;
 
-var testMode = false;
+var testMode = true;
 
 if (testMode){
     voteRoundTime = 15;
