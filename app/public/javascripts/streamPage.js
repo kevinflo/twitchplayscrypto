@@ -102,13 +102,55 @@ function updateBalancesContainer() {
         var currencyData = cryptoState[b];
 
         if (currencyData && currencyData.Balance){
-            $(".balances").append("<div>" + currencyData.Currency + " : " + currencyData.Balance + "</div>")            
+            var normalizedBalance = currencyData.Balance.toString();
+
+            if (normalizedBalance.length > 7){
+                normalizedBalance = normalizedBalance.slice(0, 7);
+            }
+
+            $(".balances").append("<div>" + currencyData.Currency + " : " + + "</div>")            
         }
     });
 }
 
 function updateTotalsContainer(){
+    if (cryptoState && cryptoState.totals && cryptoState.totals.BTC && cryptoState.totals.USD){
+        var normalizedUSD = cryptoState.totals.USD.toString();
+        var normalizedBTC = cryptoState.totals.BTC.toString();
 
+        if (normalizedUSD.length > 7){
+            normalizedUSD = normalizedUSD.slice(0, 7);
+        }
+        if (normalizedBTC.length > 7){
+            normalizedBTC = normalizedBTC.slice(0, 7);
+        }
+
+        var profit = cryptoState.totals.USD > startingUSD;
+        var difference = Math.abs(startingUSD - cryptoState.totals.USD);
+
+        var differenceCharacter = "- ";
+        if (profit){
+            differenceCharacter = "+ ";
+        }
+
+        var normalizedDifference = difference.toString();
+
+        if (normalizedDifference.length > 6){
+            normalizedDifference = normalizedDifference.slice(0, 6);
+        }
+
+        var totalString = "\$" + normalizedUSD + " (" + normalizedBTC + " BTC) (" + differenceCharacter + "$" + normalizedDifference + ") lifetime";
+
+        $(".totals-info").html(totalString);
+
+        if (profit){
+            $(".totals").addClass("profit");
+            $(".totals").removeClass("loss");
+        } else {
+            $(".totals").addClass("loss");
+            $(".totals").removeClass("profit");
+        }
+    }
 }
 
 function updateFeatureContainer(){
