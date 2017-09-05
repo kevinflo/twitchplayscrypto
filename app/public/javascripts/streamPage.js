@@ -10,7 +10,7 @@ var timeState = {
 };
 
 
-function startApp(){
+function startApp() {
     console.log("starting app")
     fetchCryptoState()
     setInterval(fetchCryptoState, 60000);
@@ -21,9 +21,9 @@ function startApp(){
 
 $(startApp.bind(this));
 
-function updateTimeState(){
-    if (!--timeState.seconds){
-        if (timeState.pause){
+function updateTimeState() {
+    if (!--timeState.seconds) {
+        if (timeState.pause) {
             handleRoundStart();
         } else {
             handlePauseStart();
@@ -32,31 +32,31 @@ function updateTimeState(){
     renderUpdatedTimeState();
 }
 
-function renderUpdatedTimeState(){
+function renderUpdatedTimeState() {
     var $timer = $(".timer");
     var seconds = timeState.seconds;
 
-    var displaySeconds = seconds % 60; 
+    var displaySeconds = seconds % 60;
     var displayMinutes = (seconds - displaySeconds) / 60;
 
     displaySeconds = displaySeconds.toString();
     displayMinutes = displayMinutes.toString();
 
-    if (displaySeconds.length === 1){
+    if (displaySeconds.length === 1) {
         displaySeconds = "0" + displaySeconds;
     }
 
     $timer.html(displayMinutes + ":" + displaySeconds);
 }
 
-function handleRoundStart(){
+function handleRoundStart() {
     timeState.seconds = voteRoundTime;
     timeState.pause = false;
 
     // todo: add calls
 }
 
-function handlePauseStart(){
+function handlePauseStart() {
     timeState.seconds = pauseRoundTime;
     timeState.pause = true;
 
@@ -64,28 +64,28 @@ function handlePauseStart(){
 }
 
 
-function buildBalanceEls(){
+function buildBalanceEls() {
     $(".balances").html("");
 
-    balances.forEach(function(b, i){
+    balances.forEach(function(b, i) {
         $(".balances").append("<div>" + b.Currency + " : " + b.Balance + "</div>")
     });
 }
 
-function updateBalances(){
-    fetch('http://localhost:3000/api/balances').then(function(resp){
-        return resp.json().then(function(resp2){
-            balances = resp2.result.filter(function(b){
+function updateBalances() {
+    fetch('http://localhost:3000/api/balances').then(function(resp) {
+        return resp.json().then(function(resp2) {
+            balances = resp2.result.filter(function(b) {
                 return b.Balance;
             });
         });
     });
 }
 
-function fetchCryptoState(){
+function fetchCryptoState() {
     updateBalances();
 }
 
-function refreshUIState(){
+function refreshUIState() {
     buildBalanceEls();
 }

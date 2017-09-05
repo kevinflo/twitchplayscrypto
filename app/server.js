@@ -14,105 +14,105 @@ var lessMiddleware = require('less-middleware');
 var _ = require('lodash');
 
 bittrex.options({
-  'apikey' : secrets.bittrex.API_KEY,
-  'apisecret' : secrets.bittrex.API_SECRET, 
+    'apikey': secrets.bittrex.API_KEY,
+    'apisecret': secrets.bittrex.API_SECRET,
 });
 
 var acceptableSymbolsList = []
 
-function buildAcceptableSymbolsList (){
-  bittrex.getmarketsummaries( function( marketData, err ) {
-    marketData.result.forEach(function(market){
-      if (
-          market.MarketName &&
-          market.MarketName.indexOf("BTC-") === 0
-      ){
-          var symbol = market.MarketName.split("BTC-")[1];
-          if (symbol && symbol.toLowerCase){
-            acceptableSymbolsList.push(symbol.toLowerCase());            
-          }
+function buildAcceptableSymbolsList() {
+    bittrex.getmarketsummaries(function(marketData, err) {
+        marketData.result.forEach(function(market) {
+            if (
+                market.MarketName &&
+                market.MarketName.indexOf("BTC-") === 0
+            ) {
+                var symbol = market.MarketName.split("BTC-")[1];
+                if (symbol && symbol.toLowerCase) {
+                    acceptableSymbolsList.push(symbol.toLowerCase());
+                }
 
-      }
+            }
+        });
     });
-  });
 }
 
 buildAcceptableSymbolsList();
 
 var defaultRoundState = {
-  votes: {
-    buy: {
+    votes: {
+        buy: {
 
-    },
-    sell: {
+        },
+        sell: {
 
-    },
-    history: []
-  }
+        },
+        history: []
+    }
 }
 
 var roundState = _.extend({}, defaultRoundState);
 
 
-function resetRoundState(){
-  roundState = _.extend({}, defaultRoundState);
+function resetRoundState() {
+    roundState = _.extend({}, defaultRoundState);
 }
 
 
-function validateSymbol(symbol){
-  var validated = false;
+function validateSymbol(symbol) {
+    var validated = false;
 
-  if (acceptableSymbolsList && acceptableSymbolsList.indexOf(symbol) >= 0){
-    validated = true;
-  }
-  console.log("validating symbol", symbol, validated)
+    if (acceptableSymbolsList && acceptableSymbolsList.indexOf(symbol) >= 0) {
+        validated = true;
+    }
+    console.log("validating symbol", symbol, validated)
 
-  return validated;
+    return validated;
 }
 
-function handleBuyVote(from, symbol){
-  console.log("handle buy vote1", from, symbol)
-  if (roundState.votes.buy[symbol]){
-    roundState.votes.buy[symbol] += 1;
-  } else {
-    roundState.votes.buy[symbol] = 1;
-  }
+function handleBuyVote(from, symbol) {
+    console.log("handle buy vote1", from, symbol)
+    if (roundState.votes.buy[symbol]) {
+        roundState.votes.buy[symbol] += 1;
+    } else {
+        roundState.votes.buy[symbol] = 1;
+    }
 
-  roundState.votes.history.push({user: from, action: "!buy", symbol: symbol});
+    roundState.votes.history.push({ user: from, action: "!buy", symbol: symbol });
 }
 
-function handleSellVote(){
-  if (roundState.votes.sell[symbol]){
-    roundState.votes.sell[symbol] += 1;
-  } else {
-    roundState.votes.sell[symbol] = 1;
-  }
-  
-  roundState.votes.history.push({user: from, action: "!buy", symbol: symbol});
+function handleSellVote() {
+    if (roundState.votes.sell[symbol]) {
+        roundState.votes.sell[symbol] += 1;
+    } else {
+        roundState.votes.sell[symbol] = 1;
+    }
+
+    roundState.votes.history.push({ user: from, action: "!buy", symbol: symbol });
 }
 
 client.addListener('message' + config.channel, function(from, message) {
     console.log("MESSAGE", from, message)
-    if (message && message.toLowerCase){
-      var normalizedMessage = message.toLowerCase();
-      if (normalizedMessage.indexOf("!buy ") === 0){
-        var symbol = normalizedMessage.split("!buy ").length && normalizedMessage.split("!buy ")[1];
+    if (message && message.toLowerCase) {
+        var normalizedMessage = message.toLowerCase();
+        if (normalizedMessage.indexOf("!buy ") === 0) {
+            var symbol = normalizedMessage.split("!buy ").length && normalizedMessage.split("!buy ")[1];
 
-        if (validateSymbol(symbol)){
-          handleBuyVote(from, symbol);
-        }
-      } else if (normalizedMessage.indexOf("!sell ") === 0){
-        var symbol = normalizedMessage.split("!sell ").length && normalizedMessage.split("!sell ")[1];
+            if (validateSymbol(symbol)) {
+                handleBuyVote(from, symbol);
+            }
+        } else if (normalizedMessage.indexOf("!sell ") === 0) {
+            var symbol = normalizedMessage.split("!sell ").length && normalizedMessage.split("!sell ")[1];
 
-        if (validateSymbol(symbol)){
-          handleSellVote(from, symbol)
+            if (validateSymbol(symbol)) {
+                handleSellVote(from, symbol)
+            }
         }
-      }
     }
 });
 
-function handleRoundEnd(){
-  console.log("HANDLING ROUND END")
+function handleRoundEnd() {
+    console.log("HANDLING ROUND END")
 }
 
 //EXPRESS
@@ -128,10 +128,10 @@ router.post('/start', function(req, res, next) {
     resetRoundState();
 })
 router.post('/end', function(req, res, next) {
-  handleRoundEnd();
+    handleRoundEnd();
 })
 router.get('/', function(req, res, next) {
-  res.json(roundState); 
+    res.json(roundState);
 })
 
 
@@ -156,20 +156,20 @@ app.use('/round', router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
 module.exports = app;
