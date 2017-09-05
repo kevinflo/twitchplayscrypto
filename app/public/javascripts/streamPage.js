@@ -11,10 +11,13 @@ var timeState = {
     seconds: pauseRoundTime
 };
 
+var testMode = true;
+
 
 function startApp() {
     console.log("starting app")
-    updateCryptoState()
+    updateCryptoState();
+    refreshUIState();
     setInterval(updateCryptoState, 60000);
     setInterval(refreshUIState, 10000);
     setInterval(updateTimeState, 1000);
@@ -108,7 +111,7 @@ function updateBalancesContainer() {
                 normalizedBalance = normalizedBalance.slice(0, 7);
             }
 
-            $(".balances").append("<div>" + currencyData.Currency + " : " + + "</div>")            
+            $(".balances").append("<div>" + currencyData.Currency + " : " + normalizedBalance + "</div>")            
         }
     });
 }
@@ -158,7 +161,9 @@ function updateFeatureContainer(){
 }
 
 function updateMetaContainer(){
-
+    if (testMode){
+        $(".test-mode").show();
+    }
 }
 
 function updateVoteTotalsContainer(){

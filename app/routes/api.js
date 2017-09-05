@@ -40,8 +40,6 @@ router.get('/balances', function(req, res, next) {
 
     bittrex.getmarketsummaries(function(marketData, err) {
         bittrex.getbalances(function(balanceData, err) {
-            console.log("GOT STUFF", marketData.result, balanceData.result)
-
             balanceData.result.forEach(function(currency) {
                 currencies[currency.Currency] = currency;
             });
@@ -97,7 +95,6 @@ router.get('/tickers', function(req, res, next) {
         var tickers = []
         for (var i in data.result) {
             bittrex.getticker({ market: data.result[i].MarketName }, function(ticker) {
-                console.log(ticker)
                 tickers.push(ticker)
 
                 if (tickers.length === Object.keys(data.result).length) {

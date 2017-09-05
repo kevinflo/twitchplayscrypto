@@ -88,3 +88,6 @@ build/Release
 
 # Debug log from npm
 npm-debug.log
+
+app/public/images/btc.png
+app/public/stylesheets/*.css
