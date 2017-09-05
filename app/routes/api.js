@@ -55,6 +55,9 @@ router.get('/balances', function(req, res, next) {
                     }
                 } else if (market.MarketName === "USDT-BTC") {
                     btcMarket = market
+                    if (currencies["BTC"]){
+                        currencies["BTC"].Last = 1;
+                    }
                 }
             });
 

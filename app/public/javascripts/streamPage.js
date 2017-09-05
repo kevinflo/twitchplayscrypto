@@ -19,14 +19,22 @@ window.cryptoState = cryptoState;
 window.roundState = roundState;
 var voteRoundTime = 600;
 var pauseRoundTime = 60;
-var startingUSD = 3721;
+
+var testMode = true;
+
+if (testMode){
+    voteRoundTime = 15;
+    pauseRoundTime = 15;
+}
+
+
+var startingUSD = 3721 + 890;
 
 var timeState = {
     pause: true,
     seconds: pauseRoundTime
 };
 
-var testMode = true;
 
 
 function startApp() {
@@ -179,7 +187,7 @@ function updateTotalsContainer(){
             normalizedDifference = normalizedDifference.slice(0, 6);
         }
 
-        var totalString = "\$" + normalizedUSD + " (" + normalizedBTC + " BTC) (" + differenceCharacter + "$" + normalizedDifference + ") lifetime";
+        var totalString = "\$" + normalizedUSD + " (" + normalizedBTC + " BTC) (" + differenceCharacter + "$" + normalizedDifference + " lifetime)";
 
         $(".totals-info").html(totalString);
 

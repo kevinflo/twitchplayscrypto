@@ -61,7 +61,6 @@ var roundState = _.extend({}, _.clone(defaultRoundState));
 
 
 function resetRoundState(winner) {
-    console.log("RESET1", roundState)
     roundState = defaultRoundState = {
         votes: {
             buy: {
@@ -82,7 +81,6 @@ function resetRoundState(winner) {
     if (winner){
         roundState.winner = winner;
     }
-    console.log("RESET2", roundState)
 }
 
 
@@ -114,7 +112,7 @@ function handleBuyVote(from, symbol) {
     }
 }
 
-function handleSellVote() {
+function handleSellVote(from, symbol) {
     if (!roundState.votes.users[from]){
         roundState.votes.users[from] = true;
 
@@ -192,19 +190,128 @@ function determineWinner(){
     return winner;
 }
 
-function transactWinner(){
-    //todo
+var btcLimit = .01;
+
+
+var marketExample = {
+    "MarketName" : "BTC-LTC",
+    "High" : 0.01350000,
+    "Low" : 0.01200000,
+    "Volume" : 3833.97619253,
+    "Last" : 0.01349998,
+    "BaseVolume" : 47.03987026,
+    "TimeStamp" : "2014-07-09T07:22:16.72",
+    "Bid" : 0.01271001,
+    "Ask" : 0.01291100,
+    "OpenBuyOrders" : 45,
+    "OpenSellOrders" : 45,
+    "PrevDay" : 0.01229501,
+    "Created" : "2014-02-13T00:00:00",
+    "DisplayMarketName" : null
+}
+
+function calculateBuy(resp, symbol, marketName){
+    var market = _.find(resp, function(resp){
+        return resp && resp.MarketName && resp.MarketName.toLowerCase() === marketName;
+    })
+
+    if (market && market.Ask){
+        var ask = market.Ask;
+
+        return {
+            quantity: btcLimit / ask,
+            rate: ask
+        }
+    }
+}
+
+function calculateSell(resp, symbol, marketName, data){
+    var balance = data && data.result && data.result.Balance;
+
+    if (balance){
+        var market = _.find(resp, function(resp){
+            return resp && resp.MarketName && resp.MarketName.toLowerCase() === marketName;
+        })
+        var bid = market.Bid;
+
+        var sellable = (bid * balance) >= btcLimit;
+
+        console.log("sellable?", bid, balance, btcLimit, btcLimit/bid, bid*balance)
+
+        if (sellable){
+            return {
+                quantity: btcLimit / bid,
+                rate: bid,
+
+            }
+        } else {
+            return {
+                quantity: balance,
+                rate: bid
+            };
+        }
+    }
+}
+
+function notBuyable(){
+    console.log("not buyable")
+}
+
+function notSellable(){
+    console.log("not sellable")
+}
+
+function transactWinner(winner){
+    //doop
+    if (winner.action && winner.action === "BUY" && winner.symbol){
+        bittrex.getbalance({currency: "BTC"}, function(data, err){
+            console.log("GOT BALANCE", data)
+            if (data && data.result && data.result.Balance > .01){
+                console.log("CAN BUY");
+
+                var marketName = "btc-" + winner.symbol.toLowerCase();
+                bittrex.getmarketsummary({market: marketName}, function(marketData,err){
+                    if (marketData && marketData.result){
+                        var calculatedBuy = calculateBuy(marketData.result, winner.symbol, marketName);
+
+                        if (calculatedBuy && calculatedBuy.quantity && calculatedBuy.rate){
+                            console.log("WOULD BUY", {market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate})
+                        }
+                    }
+                });
+            } else {
+                notBuyable();
+            }
+        })
+    } else if (winner.action && winner.action === "SELL" && winner.symbol){
+        bittrex.getbalance({currency: winner.symbol}, function(data, err){
+            console.log("GOT BALANCE", data)
+
+            var marketName = "btc-" + winner.symbol.toLowerCase();
+            bittrex.getmarketsummary({market: marketName}, function(marketData,err){
+                if (marketData && marketData.result){
+                    console.log("md", marketData, marketData.result)
+                    var calculatedSell = calculateSell(marketData.result, winner.symbol, marketName, data);
+
+                    if (calculatedSell.quantity && calculatedSell.rate){
+                        console.log("WOULD sell", {market: marketName, quantity: calculatedSell.quantity, rate: calculatedSell.rate})
+                    } 
+                }
+            });
+        })
+    }
 }
 
 function handleRoundEnd() {
     var winner = determineWinner();
 
     console.log("determined winner", winner);
+
+    resetRoundState(winner);
+
     if (winner && winner.action){
         transactWinner(winner);
     }
-
-    resetRoundState(winner);
 }
 
 //EXPRESS
@@ -228,6 +335,15 @@ router.get('/', function(req, res, next) {
     res.header('Expires', '-1');
     res.header('Pragma', 'no-cache');
     res.json(roundState);
+})
+router.get("/testbuy", function(req, res, next){
+    // bittrex.sendCustomRequest("https://bittrex.com/api/v1.1/account/getbalance?apikey="+ secrets.bittrex.API_KEY +"&currency=sc", function(data, err) {
+    //     res.json(data);
+    // });
+
+    bittrex.getbalance({currency: "BTC"}, function(data, err){
+        res.json(data);
+    })
 })
 
 
