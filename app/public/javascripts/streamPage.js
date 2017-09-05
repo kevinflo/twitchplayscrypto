@@ -24,47 +24,49 @@ $(function(){
     var testMode = false;
 
     if (testMode){
-        voteRoundTime = 15;
+        voteRoundTime = 20;
         pauseRoundTime = 5;
     }
 
 
     var startingUSD = 3721 + 890;
 
-    var timeState = {
-        pause: true,
-        seconds: pauseRoundTime
-    };
-
     function startApp() {
+        var timeState = {
+            pause: false,
+            seconds: voteRoundTime
+        };
+
         console.log("starting app")
         updateCryptoState();
         refreshUIState();
         setInterval(updateCryptoState, 60000);
         setInterval(refreshUIState, 5000);
         setInterval(function(){
-            updateTimeState()
+            timeState = updateTimeState(timeState)
         }, 1000);
         setInterval(updateRoundState, 2000);
     }
 
     startApp();
 
-    function updateTimeState() {
-        timeState.seconds = timeState.seconds - 1;
-        if (timeState.seconds === 0) {
-            if (timeState.pause) {
-                handleRoundStart();
+    function updateTimeState(internalTimeState) {
+        internalTimeState.seconds = internalTimeState.seconds - 1;
+        if (internalTimeState.seconds === 0) {
+            if (internalTimeState.pause) {
+                internalTimeState = handleRoundStart(internalTimeState);
             } else {
-                handlePauseStart();
+                internalTimeState = handlePauseStart(internalTimeState);
             }
         }
-        renderUpdatedTimeState();
+        renderUpdatedTimeState(internalTimeState);
+
+        return internalTimeState;
     }
 
-    function renderUpdatedTimeState() {
+    function renderUpdatedTimeState(internalTimeState) {
         var $timer = $(".round-time");
-        var seconds = timeState.seconds;
+        var seconds = internalTimeState.seconds;
 
         var displaySeconds = seconds % 60;
         var displayMinutes = (seconds - displaySeconds) / 60;
@@ -79,9 +81,9 @@ $(function(){
         $timer.html(displayMinutes + ":" + displaySeconds);
     }
 
-    function handleRoundStart() {
-        timeState.seconds = voteRoundTime;
-        timeState.pause = false;
+    function handleRoundStart(internalTimeState) {
+        internalTimeState.seconds = voteRoundTime;
+        internalTimeState.pause = false;
 
         $(".time-title").html("Round ends in:");
 
@@ -97,11 +99,13 @@ $(function(){
             console.log("round started");
 
         });
+
+        return internalTimeState;
     }
 
-    function handlePauseStart() {
-        timeState.seconds = pauseRoundTime;
-        timeState.pause = true;
+    function handlePauseStart(internalTimeState) {
+        internalTimeState.seconds = pauseRoundTime;
+        internalTimeState.pause = true;
 
         $(".time-title").html("Round starts in:");
 
@@ -116,6 +120,8 @@ $(function(){
         }).then(function(resp){
             console.log("round ended");
         });
+
+        return internalTimeState;
     }
 
     function updateCryptoState() {
