@@ -265,7 +265,6 @@ function notSellable(){
 }
 
 function transactWinner(winner){
-    //doop
     if (winner.action && winner.action === "BUY" && winner.symbol){
         bittrex.getbalance({currency: "BTC"}, function(data, err){
             console.log("GOT BALANCE", data)
@@ -278,7 +277,8 @@ function transactWinner(winner){
                         var calculatedBuy = calculateBuy(marketData.result, winner.symbol, marketName);
 
                         if (calculatedBuy && calculatedBuy.quantity && calculatedBuy.rate){
-                            console.log("WOULD BUY", {market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate})
+                            console.log("EXECUTING BUY", {market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate})
+                            bittrex.buylimit({market: marketName, quantity: quantity, rate: rate});
                         }
                     }
                 });
@@ -297,7 +297,8 @@ function transactWinner(winner){
                     var calculatedSell = calculateSell(marketData.result, winner.symbol, marketName, data);
 
                     if (calculatedSell.quantity && calculatedSell.rate){
-                        console.log("WOULD sell", {market: marketName, quantity: calculatedSell.quantity, rate: calculatedSell.rate})
+                        console.log("EXECUTING SELL", {market: marketName, quantity: calculatedSell.quantity, rate: calculatedSell.rate})
+                        bittrex.selllimit({market: marketName, quantity: quantity, rate: rate});
                     } 
                 }
             });
