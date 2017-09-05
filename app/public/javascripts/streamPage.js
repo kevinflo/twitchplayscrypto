@@ -1,7 +1,22 @@
 console.log("js loaded")
 
 var cryptoState = {};
+var roundState = {
+    votes: {
+        buy: {
+
+        },
+        sell: {
+
+        },
+        history: [],
+        users: {
+
+        }
+    }
+};
 window.cryptoState = cryptoState;
+window.roundState = roundState;
 var voteRoundTime = 600;
 var pauseRoundTime = 60;
 var startingUSD = 3721;
@@ -19,8 +34,9 @@ function startApp() {
     updateCryptoState();
     refreshUIState();
     setInterval(updateCryptoState, 60000);
-    setInterval(refreshUIState, 10000);
+    setInterval(refreshUIState, 5000);
     setInterval(updateTimeState, 1000);
+    setInterval(updateRoundState, 2000);
 }
 
 
@@ -58,20 +74,41 @@ function handleRoundStart() {
     timeState.seconds = voteRoundTime;
     timeState.pause = false;
 
-    // todo: add calls
+    $(".time-title").html("Round ends in:");
+
+    fetch("http://localhost:3000/round/start", {
+        method: "POST"
+    }).then(function(resp){
+        console.log("round started");
+
+    });
 }
 
 function handlePauseStart() {
     timeState.seconds = pauseRoundTime;
     timeState.pause = true;
 
-    // todo: add calls
+    $(".time-title").html("Round starts in:");
+
+    fetch("http://localhost:3000/round/end", {
+        method: "POST"
+    }).then(function(resp){
+        console.log("round ended");
+    });
 }
 
 function updateCryptoState() {
     fetch('http://localhost:3000/api/balances').then(function(resp) {
         return resp.json().then(function(resp2) {
             cryptoState = resp2
+        });
+    });
+}
+
+function updateRoundState(){
+    fetch('http://localhost:3000/round').then(function(resp) {
+        return resp.json().then(function(resp2) {
+            roundState = resp2
         });
     });
 }
@@ -157,6 +194,26 @@ function updateTotalsContainer(){
 }
 
 function updateFeatureContainer(){
+    renderBTCPrice();
+    renderLastWinner();
+}
+
+function renderLastWinner(){
+    if (roundState && roundState.winner && roundState.winner.situation !== "NO_WINNER"){
+        $(".last-winner-label").show();
+        $(".last-winner-info").show();
+        if (roundState.winner.situation === "TIE"){
+            $(".last-winner-info").html("Last round was a tie. Waiting for a real winner!");
+        } else if (roundState.winner.action && roundState.winner.symbol && roundState.winner.symbol.toUpperCase) {
+            $(".last-winner-info").html("!" + roundState.winner.action + " " + roundState.winner.symbol.toUpperCase());                
+        }
+    } else {
+        $(".last-winner-label").hide();
+        $(".last-winner-info").hide();
+    }
+}
+
+function renderBTCPrice(){
     if (cryptoState && cryptoState.btcMarket && cryptoState.btcMarket.Last){
         var price = cryptoState.btcMarket.Last;
 
@@ -166,6 +223,11 @@ function updateFeatureContainer(){
 
         if (prevDay < price){
             up = true;
+        }
+
+        var normalizedPrice = price.toString();
+        if (normalizedPrice.length > 6){
+            normalizedPrice = normalizedPrice.slice(0, 6);
         }
 
         var difference = 100 - (price / prevDay) * 100;
@@ -182,7 +244,7 @@ function updateFeatureContainer(){
             differenceCharacter = "+";
         }
 
-        var priceString = "$ " + price.toString();
+        var priceString = "$ " + normalizedPrice;
 
         priceString += " (" + differenceCharacter + " " + normalizedDifference + " %)" ;
 
@@ -204,10 +266,32 @@ function updateMetaContainer(){
     }
 }
 
-function updateVoteTotalsContainer(){
+function normalizeUsername(name){
+    var normalized = name;
+    if (name && name.length && name){
+        if (name.length > 12){
+            normalized = name.slice(0, 11);
+        }
+    }
 
+    return normalized;
+}
+
+function updateVoteTotalsContainer(){
+    $(".vote-totals-list").html("");
+
+    Object.keys(roundState.votes.buy).forEach(function(k){
+        $(".vote-totals-list").append("<li>!buy " + k + " : " +  roundState.votes.buy[k] + "</li>")
+    });
+    Object.keys(roundState.votes.sell).forEach(function(k){
+        $(".vote-totals-list").append("<li>!sell " + k + " : " +  roundState.votes.sell[k] + "</li>")
+    });
 }
 
 function updateVoteHistoryContainer(){
+    $(".vote-history-list").html("");
 
+    roundState.votes.history.forEach(function(vote){
+        $(".vote-history-list").append("<li>" + normalizeUsername(vote.user) + " : " +  vote.action + " " + vote.symbol + "</li>")
+    });
 }

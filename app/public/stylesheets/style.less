@@ -29,6 +29,15 @@ p {
     color: white;
 }
 
+ul {
+  list-style-type: none;
+  padding:0;
+  li{
+    font-size:20px;
+    font-weight:bold;
+  }
+}
+
 .container {
     background-color: #151b26;
     position: absolute;
@@ -42,7 +51,7 @@ p {
         top: 0;
         right: 1620px;
         bottom: 0;
-        font-size: 21px;
+        font-size: 28px;
         font-weight: bold;
     }
     &.totals {
@@ -87,7 +96,7 @@ p {
         color:white;
         text-align:center;
         font-size:72px;
-        padding-top: 232px;
+        padding-top: 100px;
         .btc-price-label{
 
         }
@@ -99,6 +108,12 @@ p {
             &.down{
                 color:red;
             }
+        }
+        .last-winner-label{
+            margin-top:34px;
+        }
+        .last-winner-info{
+
         }
     }
     &.meta {
@@ -120,11 +135,17 @@ p {
         bottom: 400px;
         left: 1620px;
         right: 0;
+        .vote-totals-label{
+            text-align: center;
+        }
     }
     &.vote-history {
         top: 680px;
         bottom: 0;
         left: 1620px;
         right: 0;
+        .vote-history-label{
+            text-align: center;
+        }
     }
 }

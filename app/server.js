@@ -47,15 +47,42 @@ var defaultRoundState = {
         sell: {
 
         },
-        history: []
+        history: [],
+        users: {
+
+        }
+    },
+    winner: {
+        situation: "NO_WINNER"
     }
 }
 
-var roundState = _.extend({}, defaultRoundState);
+var roundState = _.extend({}, _.clone(defaultRoundState));
 
 
-function resetRoundState() {
-    roundState = _.extend({}, defaultRoundState);
+function resetRoundState(winner) {
+    console.log("RESET1", roundState)
+    roundState = defaultRoundState = {
+        votes: {
+            buy: {
+
+            },
+            sell: {
+
+            },
+            history: [],
+            users: {
+
+            }
+        },
+        winner: {
+            situation: "NO_WINNER"
+        }
+    }
+    if (winner){
+        roundState.winner = winner;
+    }
+    console.log("RESET2", roundState)
 }
 
 
@@ -65,34 +92,47 @@ function validateSymbol(symbol) {
     if (acceptableSymbolsList && acceptableSymbolsList.indexOf(symbol) >= 0) {
         validated = true;
     }
-    console.log("validating symbol", symbol, validated)
 
     return validated;
 }
 
 function handleBuyVote(from, symbol) {
-    console.log("handle buy vote1", from, symbol)
-    if (roundState.votes.buy[symbol]) {
-        roundState.votes.buy[symbol] += 1;
-    } else {
-        roundState.votes.buy[symbol] = 1;
-    }
+    if (!roundState.votes.users[from]){
+        roundState.votes.users[from] = true;
 
-    roundState.votes.history.push({ user: from, action: "!buy", symbol: symbol });
+        if (roundState.votes.buy[symbol]) {
+            roundState.votes.buy[symbol] += 1;
+        } else {
+            roundState.votes.buy[symbol] = 1;
+        }
+
+        roundState.votes.history.unshift({ user: from, action: "!buy", symbol: symbol });
+
+        if (roundState.votes.history.length > 100){
+            roundState.votes.history = roundState.votes.history.slice(0, 60);
+        }
+    }
 }
 
 function handleSellVote() {
-    if (roundState.votes.sell[symbol]) {
-        roundState.votes.sell[symbol] += 1;
-    } else {
-        roundState.votes.sell[symbol] = 1;
-    }
+    if (!roundState.votes.users[from]){
+        roundState.votes.users[from] = true;
 
-    roundState.votes.history.push({ user: from, action: "!buy", symbol: symbol });
+        if (roundState.votes.sell[symbol]) {
+            roundState.votes.sell[symbol] += 1;
+        } else {
+            roundState.votes.sell[symbol] = 1;
+        }
+
+        roundState.votes.history.unshift({ user: from, action: "!sell", symbol: symbol });
+
+        if (roundState.votes.history.length > 100){
+            roundState.votes.history = roundState.votes.history.slice(0, 60);
+        }
+    }
 }
 
 client.addListener('message' + config.channel, function(from, message) {
-    console.log("MESSAGE", from, message)
     if (message && message.toLowerCase) {
         var normalizedMessage = message.toLowerCase();
         if (normalizedMessage.indexOf("!buy ") === 0) {
@@ -111,8 +151,60 @@ client.addListener('message' + config.channel, function(from, message) {
     }
 });
 
-function handleRoundEnd() {
 
+function determineWinner(){
+    var best = 0;
+    var winner = {
+        situation: "NO_WINNER"
+    };
+    var tie = true;
+
+    Object.keys(roundState.votes.buy).forEach(function(k){
+        if (roundState.votes.buy[k] && roundState.votes.buy[k] > best){
+            tie = false;
+            winner = {
+                symbol: k,
+                action: "BUY"
+            }
+        } else if (roundState.votes.buy[k] && roundState.votes.buy[k] === best){
+            tie = true;
+            winner = {
+                situation: "TIE"
+            }
+        }
+    });
+
+    Object.keys(roundState.votes.sell).forEach(function(k){
+        if (roundState.votes.sell[k] && roundState.votes.sell[k] > best){
+            tie = false;
+            winner = {
+                symbol: k,
+                action: "SELL"
+            }
+        } else if (roundState.votes.sell[k] && roundState.votes.sell[k] === best){
+            tie = true;
+            winner = {
+                situation: "TIE"
+            }
+        }
+    });
+
+    return winner;
+}
+
+function transactWinner(){
+    //todo
+}
+
+function handleRoundEnd() {
+    var winner = determineWinner();
+
+    console.log("determined winner", winner);
+    if (winner && winner.action){
+        transactWinner(winner);
+    }
+
+    resetRoundState(winner);
 }
 
 //EXPRESS
@@ -124,12 +216,17 @@ var app = express();
 var router = express.Router();
 
 router.post('/start', function(req, res, next) {
+    console.log("round started")
     resetRoundState();
 })
 router.post('/end', function(req, res, next) {
+    console.log("round ended")
     handleRoundEnd();
 })
 router.get('/', function(req, res, next) {
+    res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    res.header('Expires', '-1');
+    res.header('Pragma', 'no-cache');
     res.json(roundState);
 })
 
