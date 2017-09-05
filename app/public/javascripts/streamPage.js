@@ -1,8 +1,10 @@
 console.log("js loaded")
 
-var balances = [];
+var cryptoState = {};
+window.cryptoState = cryptoState;
 var voteRoundTime = 600;
 var pauseRoundTime = 60;
+var startingUSD = 3721;
 
 var timeState = {
     pause: true,
@@ -12,8 +14,8 @@ var timeState = {
 
 function startApp() {
     console.log("starting app")
-    fetchCryptoState()
-    setInterval(fetchCryptoState, 60000);
+    updateCryptoState()
+    setInterval(updateCryptoState, 60000);
     setInterval(refreshUIState, 10000);
     setInterval(updateTimeState, 1000);
 }
@@ -33,7 +35,7 @@ function updateTimeState() {
 }
 
 function renderUpdatedTimeState() {
-    var $timer = $(".timer");
+    var $timer = $(".round-time");
     var seconds = timeState.seconds;
 
     var displaySeconds = seconds % 60;
@@ -63,17 +65,16 @@ function handlePauseStart() {
     // todo: add calls
 }
 
-
-function buildBalanceEls() {
-    $(".balances").html("");
-
-    balances.forEach(function(b, i) {
-        $(".balances").append("<div>" + b.Currency + " : " + b.Balance + "</div>")
+function updateCryptoState() {
+    fetch('http://localhost:3000/api/balances').then(function(resp) {
+        return resp.json().then(function(resp2) {
+            cryptoState = resp2
+        });
     });
 }
 
-function updateBalances() {
-    fetch('http://localhost:3000/api/balances').then(function(resp) {
+function updateCryptoStateOld() {
+    fetch('http://localhost:3000/api/balance').then(function(resp) {
         return resp.json().then(function(resp2) {
             balances = resp2.result.filter(function(b) {
                 return b.Balance;
@@ -82,10 +83,46 @@ function updateBalances() {
     });
 }
 
-function fetchCryptoState() {
-    updateBalances();
-}
+
+////////////////////////// UI STUFF //////////////////////////
 
 function refreshUIState() {
-    buildBalanceEls();
+    updateBalancesContainer();
+    updateTotalsContainer();
+    updateFeatureContainer();
+    updateMetaContainer();
+    updateVoteTotalsContainer();
+    updateVoteHistoryContainer();
+}
+
+function updateBalancesContainer() {
+    $(".balances").html("<h1>Balances</h1>");
+
+    Object.keys(cryptoState).forEach(function(b, i) {
+        var currencyData = cryptoState[b];
+
+        if (currencyData && currencyData.Balance){
+            $(".balances").append("<div>" + currencyData.Currency + " : " + currencyData.Balance + "</div>")            
+        }
+    });
+}
+
+function updateTotalsContainer(){
+
+}
+
+function updateFeatureContainer(){
+
+}
+
+function updateMetaContainer(){
+
+}
+
+function updateVoteTotalsContainer(){
+
+}
+
+function updateVoteHistoryContainer(){
+
 }

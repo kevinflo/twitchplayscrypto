@@ -112,13 +112,12 @@ client.addListener('message' + config.channel, function(from, message) {
 });
 
 function handleRoundEnd() {
-    console.log("HANDLING ROUND END")
+
 }
 
 //EXPRESS
 
 var index = require('./routes/index');
-var users = require('./routes/users');
 var api = require('./routes/api');
 
 var app = express();

@@ -5,6 +5,9 @@ body {
     color:white;
     font-family: 'Roboto', sans-serif;
     overflow: hidden;
+    min-height:1080px;
+    min-width:1080px;
+    overflow: scroll;
 }
 
 .page{
@@ -24,4 +27,66 @@ a {
 
 p{
 	color:white;
+}
+
+.container{
+    background-color: #151b26;
+    position:absolute;
+    padding:0;
+    margin:0;
+    color: #9ca6af;
+    padding:12px;
+
+    &.balances{
+        left:0;
+        top:0;
+        right:1620px;
+        bottom:0;
+    }
+    &.totals{
+        left:300px;
+        top:0;
+        bottom:880px;
+        right:300px;
+        &.profit{
+            background-color: #76C4AE;
+        }
+        &.loss{
+            background-color: #d86C70;
+        }
+    }
+    &.timer{
+        top:0;
+        bottom:880px;
+        right:0;
+        left:1620px;
+        text-align: center;
+        font-size: 36px;
+        padding-top: 64px;
+    }
+    &.feature{
+        top:200px;
+        bottom:200px;
+        left:300px;
+        right:300px;
+        background-color: orange;
+    }
+    &.meta{
+        top:880px;
+        bottom:0;
+        left:300px;
+        right:300px;
+    }
+    &.vote-totals{
+        top:200px;
+        bottom:400px;
+        left:1620px;
+        right:0;
+    }
+    &.vote-history{
+        top:680px;
+        bottom:0;
+        left:1620px;
+        right:0;
+    }
 }
