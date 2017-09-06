@@ -238,6 +238,8 @@ function calculateSell(resp, symbol, marketName, data){
                 rate: bid
             };
         }
+    } else {
+        return {};
     }
 }
 
