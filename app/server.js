@@ -155,34 +155,23 @@ function determineWinner(){
     var winner = {
         situation: "NO_WINNER"
     };
-    var tie = true;
 
     Object.keys(roundState.votes.buy).forEach(function(k){
         if (roundState.votes.buy[k] && roundState.votes.buy[k] > best){
-            tie = false;
+            best = roundState.votes.buy[k];
             winner = {
                 symbol: k,
                 action: "BUY"
-            }
-        } else if (roundState.votes.buy[k] && roundState.votes.buy[k] === best){
-            tie = true;
-            winner = {
-                situation: "TIE"
             }
         }
     });
 
     Object.keys(roundState.votes.sell).forEach(function(k){
         if (roundState.votes.sell[k] && roundState.votes.sell[k] > best){
-            tie = false;
+            best = roundState.votes.sell[k];
             winner = {
                 symbol: k,
                 action: "SELL"
-            }
-        } else if (roundState.votes.sell[k] && roundState.votes.sell[k] === best){
-            tie = true;
-            winner = {
-                situation: "TIE"
             }
         }
     });
@@ -191,7 +180,6 @@ function determineWinner(){
 }
 
 var btcLimit = .01;
-
 
 var marketExample = {
     "MarketName" : "BTC-LTC",
@@ -268,7 +256,7 @@ function transactWinner(winner){
     if (winner.action && winner.action === "BUY" && winner.symbol){
         bittrex.getbalance({currency: "BTC"}, function(data, err){
             console.log("GOT BALANCE", data)
-            if (data && data.result && data.result.Balance > .01){
+            if (data && data.result && data.result.Balance > .012){
                 console.log("CAN BUY");
 
                 var marketName = "btc-" + winner.symbol.toLowerCase();

@@ -18,7 +18,7 @@ $(function(){
     };
     window.cryptoState = cryptoState;
     window.roundState = roundState;
-    var voteRoundTime = 600;
+    var voteRoundTime = 480;
     var pauseRoundTime = 60;
 
     var testMode = true;
@@ -40,8 +40,8 @@ $(function(){
     console.log("starting app")
     updateCryptoState();
     refreshUIState();
-    setInterval(updateCryptoState, 60000);
-    setInterval(refreshUIState, 5000);
+    setInterval(updateCryptoState, 20000);
+    setInterval(refreshUIState, 3000);
     setInterval(function(){
         timeState = updateTimeState(timeState)
     }, 1000);
@@ -67,6 +67,10 @@ $(function(){
         var $timer = $(".round-time");
         var seconds = internalTimeState.seconds;
 
+        if (internalTimeState.pause){
+            $(".vote-totals-list").html("");
+            $(".vote-history-list").html("");
+        }
         var displaySeconds = seconds % 60;
         var displayMinutes = (seconds - displaySeconds) / 60;
 
@@ -218,7 +222,7 @@ $(function(){
                 normalizedDifference = normalizedDifference.slice(0, 6);
             }
 
-            var totalString = "\$" + normalizedUSD + " (" + normalizedBTC + " BTC) (" + differenceCharacter + "$" + normalizedDifference + " lifetime)";
+            var totalString = "\$" + normalizedUSD + " (" + normalizedBTC + " BTC) (" + differenceCharacter + "$" + normalizedDifference + " since 9/4)";
 
             $(".totals-info").html(totalString);
 
