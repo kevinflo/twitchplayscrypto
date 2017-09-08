@@ -40,36 +40,40 @@ router.get('/balances', function(req, res, next) {
 
     bittrex.getmarketsummaries(function(marketData, err) {
         bittrex.getbalances(function(balanceData, err) {
-            balanceData.result.forEach(function(currency) {
-                currencies[currency.Currency] = currency;
-            });
+            if (balanceData && balanceData.result && Array.isArray(balanceData.result)){
+                balanceData.result.forEach(function(currency) {
+                    currencies[currency.Currency] = currency;
+                });
 
-            marketData.result.forEach(function(market) {
-                if (
-                    market.MarketName &&
-                    market.MarketName.indexOf("BTC-") === 0
-                ) {
-                    var currency = market.MarketName.split("BTC-")[1];
-                    if (currencies[currency]) {
-                        currencies[currency] = _.extend({}, currencies[currency], market);
+                marketData.result.forEach(function(market) {
+                    if (
+                        market.MarketName &&
+                        market.MarketName.indexOf("BTC-") === 0
+                    ) {
+                        var currency = market.MarketName.split("BTC-")[1];
+                        if (currencies[currency]) {
+                            currencies[currency] = _.extend({}, currencies[currency], market);
+                        }
+                    } else if (market.MarketName === "USDT-BTC") {
+                        btcMarket = market
+                        if (currencies["BTC"]){
+                            currencies["BTC"].Last = 1;
+                        }
                     }
-                } else if (market.MarketName === "USDT-BTC") {
-                    btcMarket = market
-                    if (currencies["BTC"]){
-                        currencies["BTC"].Last = 1;
-                    }
-                }
-            });
+                });
 
-            var totals = {};
+                var totals = {};
 
-            totals.BTC = calculateTotalBTC(currencies, btcMarket);
-            totals.USD = calculateTotalUSD(totals.BTC, btcMarket);
+                totals.BTC = calculateTotalBTC(currencies, btcMarket);
+                totals.USD = calculateTotalUSD(totals.BTC, btcMarket);
 
-            currencies.totals = totals;
-            currencies.btcMarket = btcMarket;
+                currencies.totals = totals;
+                currencies.btcMarket = btcMarket;
 
-            res.json(currencies);
+                res.json(currencies);
+            } else {
+                res.json({});
+            }
         });
     });
 });
