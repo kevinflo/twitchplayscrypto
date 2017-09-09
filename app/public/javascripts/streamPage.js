@@ -191,7 +191,69 @@ $(function(){
                     normalizedBalance = normalizedBalance.slice(0, 7);
                 }
 
-                $(".balances").append("<div>" + currencyData.Currency + " : " + normalizedBalance + "</div>")            
+                var prevDay = currencyData.PrevDay;
+                var price = currencyData.Last;
+
+                var up = false;
+
+                if (prevDay < price){
+                    up = true;
+                }
+
+                var normalizedDifference = percentChange(prevDay, price);
+
+                if (normalizedDifference.length > 3){
+                    normalizedDifference = normalizedDifference.slice(0, 3);
+                }
+
+                var differenceCharacter = "-";
+
+                if (up){
+                    differenceCharacter = "+";
+                }
+                var priceString = "(" +differenceCharacter + " " + normalizedDifference + "%)" ;
+
+                var upClass = "down";
+
+                if (up){
+                    upClass = "up";
+                }
+
+                if (currencyData.Currency === "BTC"){
+                    var price = cryptoState.btcMarket.Last;
+
+                    var prevDay = cryptoState.btcMarket.PrevDay;
+
+                    var up = false;
+
+                    if (prevDay < price){
+                        up = true;
+                    }
+
+                    var normalizedPrice = price.toString();
+                    if (normalizedPrice.length > 6){
+                        normalizedPrice = normalizedPrice.slice(0, 6);
+                    }
+
+                    var difference = Math.abs(100 - (price / prevDay) * 100);
+
+                    var normalizedDifference = difference.toString();
+
+                    if (normalizedDifference.length > 3){
+                        normalizedDifference = normalizedDifference.slice(0, 3);
+                    }
+
+                    var differenceCharacter = "-";
+
+                    if (up){
+                        differenceCharacter = "+";
+                    }
+
+                    var priceString = "(" + differenceCharacter + " " + normalizedDifference + "%)" ;
+                }
+
+
+                $(".balances").append("<div class=" + upClass + ">" + currencyData.Currency + " : " + normalizedBalance + " " + priceString + "</div>")            
             }
         });
     }
@@ -248,7 +310,7 @@ $(function(){
             if (roundState.winner.situation === "TIE"){
                 $(".last-winner-info").html("Last round was a tie. Waiting for a real winner!");
             } else if (roundState.winner.situation === "NOT_ENOUGH"){
-                 $(".last-winner-info").html("Insufficient BTC in account to place buy :(");
+                 $(".last-winner-info").html("Insufficient BTC to place buy :(");
             } else if (roundState.winner.action && roundState.winner.symbol && roundState.winner.symbol.toUpperCase) {
                 $(".last-winner-info").html("!" + roundState.winner.action + " " + roundState.winner.symbol.toUpperCase());                
             }
@@ -256,6 +318,11 @@ $(function(){
             $(".last-winner-label").hide();
             $(".last-winner-info").hide();
         }
+    }
+
+    function percentChange (prev, today){
+        var diff = Math.abs(100 - (today / prev) * 100);
+        return diff && diff.toString && diff.toString();
     }
 
     function renderBTCPrice(){
