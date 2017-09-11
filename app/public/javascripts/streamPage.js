@@ -247,6 +247,7 @@ $(function(){
 
                     if (up){
                         differenceCharacter = "+";
+                        upClass = "up";
                     }
 
                     var priceString = "(" + differenceCharacter + " " + normalizedDifference + "%)" ;
