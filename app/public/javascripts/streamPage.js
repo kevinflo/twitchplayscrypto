@@ -273,19 +273,21 @@ $(function(){
             return b.ourBalance > .001;
         });
 
-        normalizedBalances = normalizedBalances.sort(function(a, b){
-            return a.ourBalance < b.ourBalance;
-        })
+        var sortedBalances = normalizedBalances.sort(function(a,b){
+            return -(a.ourBalance - b.ourBalance);
+        });
 
-        normalizedBalances.forEach(function(b){
-            $(".balances").append("<div class=" + b.upClass + ">" + b.currency + " : " + b.normalizedBalance + " " + b.ourBalanceString + b.priceString + "</div>")
-        })
+        window.nb = sortedBalances
+
+        sortedBalances.forEach(function(b){
+            $(".balances").append("<div class=" + b.upClass + ">" + b.currency + " : " + b.normalizedBalance + "    " + b.ourBalanceString + "    " + b.priceString + "</div>")
+        });
     }
 
     function updateTotalsContainer(){
         if (cryptoState && cryptoState.totals && cryptoState.totals.BTC && cryptoState.totals.USD){
             var normalizedUSD = cryptoState.totals.USD.toFixed(2).toString();
-            var normalizedBTC = cryptoState.totals.BTC.toFixed(2).toString();
+            var normalizedBTC = cryptoState.totals.BTC.toFixed(3).toString();
 
             // if (normalizedUSD.length > 7){
             //     normalizedUSD = normalizedUSD.slice(0, 7);
@@ -308,7 +310,7 @@ $(function(){
                 normalizedDifference = normalizedDifference.slice(0, 6);
             }
 
-            var totalString = "\$" + normalizedUSD + " (" + normalizedBTC + " BTC)<br /> <span class='total-change'>(" + differenceCharacter + "$" + normalizedDifference + " since 9/4)</span>";
+            var totalString = "\$" + normalizedUSD + " (" + normalizedBTC + " BTC)<br /> <span class='total-change'>(" + differenceCharacter + "$" + normalizedDifference + " total since 9/4)</span>";
 
             $(".totals-info").html(totalString);
 
