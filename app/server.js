@@ -20,17 +20,17 @@ bittrex.options({
 });
 
 fs.writeFile('logs/votes.txt', "", { flag: 'wx' }, function (err) {
-    if (err) throw err;
+    if (err) console.log(err);
     console.log("votes saved!");
 });
 
 fs.writeFile('logs/orders.txt', "", { flag: 'wx' }, function (err) {
-    if (err) throw err;
+    if (err) console.log(err);
     console.log("orders saved!");
 });
 
 fs.writeFile('logs/balances.txt', "", { flag: 'wx' }, function (err) {
-    if (err) throw err;
+    if (err) console.log(err);
     console.log("balances saved!");
 });
 

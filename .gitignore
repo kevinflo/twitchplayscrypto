@@ -91,3 +91,6 @@ npm-debug.log
 
 app/public/images/btc.png
 app/public/stylesheets/*.css
+logs/balances.txt
+logs/orders.txt
+logs/votes.txt
