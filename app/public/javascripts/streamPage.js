@@ -304,11 +304,11 @@ $(function(){
                 differenceCharacter = "+";
             }
 
-            var normalizedDifference = difference.toString();
+            var normalizedDifference = difference.toFixed(2).toString();
 
-            if (normalizedDifference.length > 6){
-                normalizedDifference = normalizedDifference.slice(0, 6);
-            }
+            // if (normalizedDifference.length > 6){
+            //     normalizedDifference = normalizedDifference.slice(0, 6);
+            // }
 
             var totalString = "\$" + normalizedUSD + " (" + normalizedBTC + " BTC)<br /> <span class='total-change'>(" + differenceCharacter + "$" + normalizedDifference + " total since 9/4)</span>";
 
