@@ -296,7 +296,7 @@ function transactWinner(winner){
                             console.log("EXECUTING BUY", {market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate})
                             bittrex.buylimit({market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate}, function(data, err){
                                 console.log("buy worked")
-                                var buyString = `{market: ${marketName}, quantity: ${calculatedBuy.quantity}, rate: ${calculatedBuy.rate}}`;
+                                var buyString = `{market: ${marketName}, buy: true, sell: false, quantity: ${calculatedBuy.quantity}, rate: ${calculatedBuy.rate}}`;
                                 fs.appendFile('logs/orders.txt', buyString, function (err) {
                                   if (err) throw err;
                                   console.log('Saved!');
@@ -323,7 +323,7 @@ function transactWinner(winner){
                         console.log("EXECUTING SELL", {market: marketName, quantity: calculatedSell.quantity, rate: calculatedSell.rate})
                         bittrex.selllimit({market: marketName, quantity: calculatedSell.quantity, rate: calculatedSell.rate}, function(data, err){
                             console.log("sell worked")
-                            var sellString = `{market: ${marketName}, quantity: ${calculatedSell.quantity}, rate: ${calculatedSell.rate}}`;
+                            var sellString = `{market: ${marketName}, sell: true, buy: false, quantity: ${calculatedSell.quantity}, rate: ${calculatedSell.rate}}`;
                             fs.appendFile('logs/orders.txt', sellString, function (err) {
                               if (err) throw err;
                               console.log('Saved!');
