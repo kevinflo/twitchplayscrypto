@@ -19,17 +19,17 @@ bittrex.options({
     'apisecret': secrets.bittrex.API_SECRET,
 });
 
-fs.writeFile('votes.txt', "", { flag: 'wx' }, function (err) {
+fs.writeFile('logs/votes.txt', "", { flag: 'wx' }, function (err) {
     if (err) throw err;
     console.log("votes saved!");
 });
 
-fs.writeFile('orders.txt', "", { flag: 'wx' }, function (err) {
+fs.writeFile('logs/orders.txt', "", { flag: 'wx' }, function (err) {
     if (err) throw err;
     console.log("orders saved!");
 });
 
-fs.writeFile('balances.txt', "", { flag: 'wx' }, function (err) {
+fs.writeFile('logs/balances.txt', "", { flag: 'wx' }, function (err) {
     if (err) throw err;
     console.log("balances saved!");
 });
@@ -123,7 +123,7 @@ function handleBuyVote(from, symbol) {
         roundState.votes.history.unshift({ user: from, action: "!buy", symbol: symbol });
 
         var buyString = `{ user: ${from}, action: "!buy", symbol: ${symbol} }`;
-        fs.appendFile('votes.txt', buyString, function (err) {
+        fs.appendFile('logs/votes.txt', buyString, function (err) {
           if (err) throw err;
           console.log('Saved!');
         });
@@ -146,7 +146,7 @@ function handleSellVote(from, symbol) {
 
         roundState.votes.history.unshift({ user: from, action: "!sell", symbol: symbol });
         var buyString = `{ user: ${from}, action: "!sell", symbol: ${symbol} }`;
-        fs.appendFile('votes.txt', buyString, function (err) {
+        fs.appendFile('logs/votes.txt', buyString, function (err) {
           if (err) throw err;
           console.log('Saved!');
         });
@@ -297,7 +297,7 @@ function transactWinner(winner){
                             bittrex.buylimit({market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate}, function(data, err){
                                 console.log("buy worked")
                                 var buyString = `{market: ${marketName}, quantity: ${calculatedBuy.quantity}, rate: ${calculatedBuy.rate}}`;
-                                fs.appendFile('orders.txt', buyString, function (err) {
+                                fs.appendFile('logs/orders.txt', buyString, function (err) {
                                   if (err) throw err;
                                   console.log('Saved!');
                                 });
@@ -324,7 +324,7 @@ function transactWinner(winner){
                         bittrex.selllimit({market: marketName, quantity: calculatedSell.quantity, rate: calculatedSell.rate}, function(data, err){
                             console.log("sell worked")
                             var sellString = `{market: ${marketName}, quantity: ${calculatedSell.quantity}, rate: ${calculatedSell.rate}}`;
-                            fs.appendFile('orders.txt', sellString, function (err) {
+                            fs.appendFile('logs/orders.txt', sellString, function (err) {
                               if (err) throw err;
                               console.log('Saved!');
                             });

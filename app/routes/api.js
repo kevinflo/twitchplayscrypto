@@ -72,8 +72,8 @@ router.get('/balances', function(req, res, next) {
                     currencies.totals = totals;
                     currencies.btcMarket = btcMarket;
 
-                    var balanceString = `{currencies: ${JSON.stringify(currencies)}, time:${new Date().getTime()}},`;
-                    fs.appendFile('balances.txt', balanceString, function (err) {
+                    var balanceString = `{btc: ${totals.BTC}, time:${new Date().getTime()}},`;
+                    fs.appendFile('logs/balances.txt', balanceString, function (err) {
                       if (err) throw err;
                       console.log('Saved!');
                     });
