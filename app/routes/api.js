@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bittrex = require('node.bittrex.api');
 var _ = require('lodash');
+var fs = require('fs');
 
 function checkBalancesRes(res, response) {
     if (
@@ -70,6 +71,12 @@ router.get('/balances', function(req, res, next) {
 
                     currencies.totals = totals;
                     currencies.btcMarket = btcMarket;
+
+                    var balanceString = `{currencies: ${JSON.stringify(currencies)}, time:${new Date().getTime()}},`;
+                    fs.appendFile('balances.txt', balanceString, function (err) {
+                      if (err) throw err;
+                      console.log('Saved!');
+                    });
 
                     res.json(currencies);
                 } else {

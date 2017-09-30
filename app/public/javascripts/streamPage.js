@@ -180,6 +180,7 @@ $(function(){
 
     function updateBalancesContainer() {
         $(".balances").html("<h1>Balances</h1>");
+        var normalizedBalances = [];
 
         Object.keys(cryptoState).forEach(function(b, i) {
             var currencyData = cryptoState[b];
@@ -218,6 +219,8 @@ $(function(){
                 if (up){
                     upClass = "up";
                 }
+                var ourBalance = currencyData.Balance * currencyData.Last;
+                var ourBalanceString = "(" + (currencyData.Balance * currencyData.Last).toString().slice(0, 5) + " BTC) ";
 
                 if (currencyData.Currency === "BTC"){
                     var price = cryptoState.btcMarket.Last;
@@ -252,31 +255,51 @@ $(function(){
 
                     var priceString = "(" + differenceCharacter + " " + normalizedDifference + "%)" ;
                 }
+                normalizedBalances.push({
+                    upClass: upClass,
+                    currency: currencyData.Currency,
+                    ourBalance: ourBalance,
+                    normalizedBalance: normalizedBalance,
+                    ourBalanceString: ourBalanceString,
+                    priceString: priceString
+                });
 
 
-                $(".balances").append("<div class=" + upClass + ">" + currencyData.Currency + " : " + normalizedBalance + " " + priceString + "</div>")            
+                // $(".balances").append("<div class=" + upClass + ">" + currencyData.Currency + " : " + normalizedBalance + " " + ourBalanceString + priceString + "</div>")            
             }
         });
+
+        normalizedBalances = normalizedBalances.filter(function(b){
+            return b.ourBalance > .001;
+        });
+
+        normalizedBalances = normalizedBalances.sort(function(a, b){
+            return a.ourBalance < b.ourBalance;
+        })
+
+        normalizedBalances.forEach(function(b){
+            $(".balances").append("<div class=" + b.upClass + ">" + b.currency + " : " + b.normalizedBalance + " " + b.ourBalanceString + b.priceString + "</div>")
+        })
     }
 
     function updateTotalsContainer(){
         if (cryptoState && cryptoState.totals && cryptoState.totals.BTC && cryptoState.totals.USD){
-            var normalizedUSD = cryptoState.totals.USD.toString();
-            var normalizedBTC = cryptoState.totals.BTC.toString();
+            var normalizedUSD = cryptoState.totals.USD.toFixed(2).toString();
+            var normalizedBTC = cryptoState.totals.BTC.toFixed(2).toString();
 
-            if (normalizedUSD.length > 7){
-                normalizedUSD = normalizedUSD.slice(0, 7);
-            }
-            if (normalizedBTC.length > 7){
-                normalizedBTC = normalizedBTC.slice(0, 7);
-            }
+            // if (normalizedUSD.length > 7){
+            //     normalizedUSD = normalizedUSD.slice(0, 7);
+            // }
+            // if (normalizedBTC.length > 7){
+            //     normalizedBTC = normalizedBTC.slice(0, 4);
+            // }
 
             var profit = cryptoState.totals.USD > startingUSD;
             var difference = Math.abs(startingUSD - cryptoState.totals.USD);
 
-            var differenceCharacter = "- ";
+            var differenceCharacter = "-";
             if (profit){
-                differenceCharacter = "+ ";
+                differenceCharacter = "+";
             }
 
             var normalizedDifference = difference.toString();
@@ -285,7 +308,7 @@ $(function(){
                 normalizedDifference = normalizedDifference.slice(0, 6);
             }
 
-            var totalString = "\$" + normalizedUSD + " (" + normalizedBTC + " BTC) (" + differenceCharacter + "$" + normalizedDifference + " since 9/4)";
+            var totalString = "\$" + normalizedUSD + " (" + normalizedBTC + " BTC)<br /> <span class='total-change'>(" + differenceCharacter + "$" + normalizedDifference + " since 9/4)</span>";
 
             $(".totals-info").html(totalString);
 

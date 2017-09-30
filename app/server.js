@@ -12,10 +12,26 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var lessMiddleware = require('less-middleware');
 var _ = require('lodash');
+var fs = require('fs');
 
 bittrex.options({
     'apikey': secrets.bittrex.API_KEY,
     'apisecret': secrets.bittrex.API_SECRET,
+});
+
+fs.writeFile('votes.txt', "", { flag: 'wx' }, function (err) {
+    if (err) throw err;
+    console.log("votes saved!");
+});
+
+fs.writeFile('orders.txt', "", { flag: 'wx' }, function (err) {
+    if (err) throw err;
+    console.log("orders saved!");
+});
+
+fs.writeFile('balances.txt', "", { flag: 'wx' }, function (err) {
+    if (err) throw err;
+    console.log("balances saved!");
 });
 
 var acceptableSymbolsList = []
@@ -106,6 +122,12 @@ function handleBuyVote(from, symbol) {
 
         roundState.votes.history.unshift({ user: from, action: "!buy", symbol: symbol });
 
+        var buyString = `{ user: ${from}, action: "!buy", symbol: ${symbol} }`;
+        fs.appendFile('votes.txt', buyString, function (err) {
+          if (err) throw err;
+          console.log('Saved!');
+        });
+
         if (roundState.votes.history.length > 100){
             roundState.votes.history = roundState.votes.history.slice(0, 60);
         }
@@ -123,7 +145,11 @@ function handleSellVote(from, symbol) {
         }
 
         roundState.votes.history.unshift({ user: from, action: "!sell", symbol: symbol });
-
+        var buyString = `{ user: ${from}, action: "!sell", symbol: ${symbol} }`;
+        fs.appendFile('votes.txt', buyString, function (err) {
+          if (err) throw err;
+          console.log('Saved!');
+        });
         if (roundState.votes.history.length > 100){
             roundState.votes.history = roundState.votes.history.slice(0, 60);
         }
@@ -270,6 +296,11 @@ function transactWinner(winner){
                             console.log("EXECUTING BUY", {market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate})
                             bittrex.buylimit({market: marketName, quantity: calculatedBuy.quantity, rate: calculatedBuy.rate}, function(data, err){
                                 console.log("buy worked")
+                                var buyString = `{market: ${marketName}, quantity: ${calculatedBuy.quantity}, rate: ${calculatedBuy.rate}}`;
+                                fs.appendFile('orders.txt', buyString, function (err) {
+                                  if (err) throw err;
+                                  console.log('Saved!');
+                                });
                             });
                         }
                     }
@@ -292,6 +323,11 @@ function transactWinner(winner){
                         console.log("EXECUTING SELL", {market: marketName, quantity: calculatedSell.quantity, rate: calculatedSell.rate})
                         bittrex.selllimit({market: marketName, quantity: calculatedSell.quantity, rate: calculatedSell.rate}, function(data, err){
                             console.log("sell worked")
+                            var sellString = `{market: ${marketName}, quantity: ${calculatedSell.quantity}, rate: ${calculatedSell.rate}}`;
+                            fs.appendFile('orders.txt', sellString, function (err) {
+                              if (err) throw err;
+                              console.log('Saved!');
+                            });
                         });
                     } 
                 }
