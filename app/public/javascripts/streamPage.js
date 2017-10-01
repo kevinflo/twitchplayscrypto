@@ -186,7 +186,7 @@ $(function(){
             var currencyData = cryptoState[b];
 
             if (currencyData && currencyData.Balance){
-                var normalizedBalance = currencyData.Balance.toString();
+                var normalizedBalance = currencyData.Balance.toFixed(3).toString();
 
                 if (normalizedBalance.length > 7){
                     normalizedBalance = normalizedBalance.slice(0, 7);
@@ -270,7 +270,7 @@ $(function(){
         });
 
         normalizedBalances = normalizedBalances.filter(function(b){
-            return b.ourBalance > .001;
+            return b.ourBalance > .002;
         });
 
         var sortedBalances = normalizedBalances.sort(function(a,b){
