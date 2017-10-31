@@ -156,6 +156,60 @@ function handleSellVote(from, symbol) {
     }
 }
 
+function handleCancelBuyVote(from, symbol) {
+    if (!roundState.votes.users[from]){
+        roundState.votes.users[from] = true;
+
+        if (roundState.votes.buy[symbol]) {
+            roundState.votes.buy[symbol] -= 1;
+
+            if (!roundState.votes.buy[symbol]){
+                delete roundState.votes.buy[symbol];
+            }
+        } else {
+            roundState.votes.buy[symbol] = 1;
+        }
+
+        roundState.votes.history.unshift({ user: from, action: "!cancelbuy", symbol: symbol });
+
+        var buyString = `{ user: ${from}, action: "!cancelbuy", symbol: ${symbol} }`;
+        fs.appendFile('logs/votes.txt', buyString, function (err) {
+          if (err) throw err;
+          console.log('Saved!');
+        });
+
+        if (roundState.votes.history.length > 100){
+            roundState.votes.history = roundState.votes.history.slice(0, 60);
+        }
+    }
+}
+
+function handleCancelSellVote(from, symbol){
+    if (!roundState.votes.users[from]){
+        roundState.votes.users[from] = true;
+
+        if (roundState.votes.sell[symbol]) {
+            roundState.votes.sell[symbol] -= 1;
+
+            if (!roundState.votes.sell[symbol]){
+                delete roundState.votes.sell[symbol];
+            }
+        } else {
+            roundState.votes.sell[symbol] = 1;
+        }
+
+        roundState.votes.history.unshift({ user: from, action: "!cancelsell", symbol: symbol });
+        var buyString = `{ user: ${from}, action: "!cancelsell", symbol: ${symbol} }`;
+        fs.appendFile('logs/votes.txt', buyString, function (err) {
+          if (err) throw err;
+          console.log('Saved!');
+        });
+        if (roundState.votes.history.length > 100){
+            roundState.votes.history = roundState.votes.history.slice(0, 60);
+        }
+    }
+}
+
 client.addListener('message' + config.channel, function(from, message) {
     if (message && message.toLowerCase) {
         var normalizedMessage = message.toLowerCase();
@@ -170,6 +224,18 @@ client.addListener('message' + config.channel, function(from, message) {
 
             if (validateSymbol(symbol)) {
                 handleSellVote(from, symbol)
+            }
+        } else if (normalizedMessage.indexOf("!cancelbuy ") === 0) {
+            var symbol = normalizedMessage.split("!cancelbuy ").length && normalizedMessage.split("!cancelbuy ")[1];
+
+            if (validateSymbol(symbol)) {
+                handleCancelBuyVote(from, symbol);
+            }
+        } else if (normalizedMessage.indexOf("!cancelsell ") === 0) {
+            var symbol = normalizedMessage.split("!cancelsell ").length && normalizedMessage.split("!cancelsell ")[1];
+
+            if (validateSymbol(symbol)) {
+                handleCancelSellVote(from, symbol);
             }
         }
     }
