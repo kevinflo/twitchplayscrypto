@@ -192,8 +192,8 @@ $(function(){
                     normalizedBalance = normalizedBalance.slice(0, 7);
                 }
 
-                var prevDay = currencyData.PrevDay;
-                var price = currencyData.Last;
+                var prevDay = currencyData.PrevDay * cryptoState.btcMarket.PrevDay;
+                var price = currencyData.Last * cryptoState.btcMarket.Last;
 
                 var up = false;
 
