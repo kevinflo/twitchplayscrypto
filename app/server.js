@@ -166,8 +166,6 @@ function handleCancelBuyVote(from, symbol) {
             if (!roundState.votes.buy[symbol]){
                 delete roundState.votes.buy[symbol];
             }
-        } else {
-            roundState.votes.buy[symbol] = 1;
         }
 
         roundState.votes.history.unshift({ user: from, action: "!cancelbuy", symbol: symbol });
@@ -194,8 +192,6 @@ function handleCancelSellVote(from, symbol){
             if (!roundState.votes.sell[symbol]){
                 delete roundState.votes.sell[symbol];
             }
-        } else {
-            roundState.votes.sell[symbol] = 1;
         }
 
         roundState.votes.history.unshift({ user: from, action: "!cancelsell", symbol: symbol });
